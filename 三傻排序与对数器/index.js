@@ -1,6 +1,4 @@
-const swap = (arr, i, j) => {
-  [arr[i], arr[j]] = [arr[j], arr[i]];
-};
+import { swap } from '../utils.js';
 
 // 选择排序
 
@@ -29,6 +27,24 @@ function bubbleSort(arr) {
       if (arr[i] > arr[i + 1]) {
         swap(arr, i, i + 1);
       }
+    }
+  }
+}
+//只用一次循环实现，实际上时间复杂度还是O(n^2)
+function bubbleSort2(arr) {
+  if (arr === null || arr.length < 2) return arr;
+  const n = arr.length;
+  let end = n - 1;
+  let i = 0;
+  while (end > 0) {
+    if (arr[i] > arr[i + 1]) {
+      swap(arr, i, i + 1);
+    }
+    if (i < end - 1) {
+      i++;
+    } else {
+      end--;
+      i = 0;
     }
   }
 }
@@ -88,7 +104,8 @@ function main() {
     let arr2 = copyArray(arr);
     let arr3 = copyArray(arr);
     selectionSort(arr1);
-    bubbleSort(arr2);
+    // bubbleSort(arr2);
+    bubbleSort2(arr2);
     insertionSort(arr3);
     if (!sameArray(arr1, arr2) || !sameArray(arr2, arr3)) {
       console.log('----出错了----');
