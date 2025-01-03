@@ -60,3 +60,49 @@ function mergeTwoLists(head1, head2) {
 
   return head;
 }
+
+//划分链表
+// leetcode链接
+function partition(head, x) {
+  let smallHead = null;
+  let smallTail = null;
+  let bigHead = null;
+  let bigTail = null;
+
+  let cur = head;
+
+  while (cur) {
+    // 单独将节点断开，需要记录下一个节点
+    const next = cur.next;
+    cur.next = null;
+    if (cur.val < x) {
+      // 小链表还没头，那么这个节点就是小链表的头
+      if (!smallHead) {
+        smallHead = cur;
+      } else {
+        smallTail.next = cur;
+      }
+      // 小链表变动了，尾节点后移
+      smallTail = cur;
+    } else {
+      // 大链表还没头，那么这个节点就是大链表的头
+      if (!bigHead) {
+        bigHead = cur;
+      } else {
+        bigTail.next = cur;
+      }
+      // 大链表变动了，尾节点后移
+      bigTail = cur;
+    }
+
+    // 准备处理下一个节点
+    cur = next;
+  }
+  //若所有节点的值都比x大，返回bigHead
+  if (!smallHead) {
+    return bigHead;
+  }
+  // 将小链表和大链表接起来
+  smallTail.next = bigHead;
+  return smallHead;
+}
