@@ -62,7 +62,7 @@ function mergeTwoLists(head1, head2) {
 }
 
 //划分链表
-// leetcode链接
+// leetcode链接 https://leetcode.cn/problems/partition-list/description/
 function partition(head, x) {
   let smallHead = null;
   let smallTail = null;
