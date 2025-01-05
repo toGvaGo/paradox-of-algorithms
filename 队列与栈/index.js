@@ -117,3 +117,115 @@ MyStack.prototype.top = function () {
 MyStack.prototype.empty = function () {
   return this.queue.length === 0;
 };
+
+// 最小栈
+// leetcode连接： https://leetcode.cn/problems/min-stack/description/
+const MinStack = function () {
+  this.stack = new Array();
+  this.min = new Array();
+};
+// 若当前栈中没有元素，或者val小于min栈栈顶，则直接push val
+// 若当前min栈栈顶元素小于val，那么再push一次栈顶元素
+MinStack.prototype.push = function (val) {
+  if (!this.min.length || val < this.min[this.min.length - 1]) {
+    this.min.push(val);
+  } else {
+    this.min.push(this.min[this.min.length - 1]);
+  }
+  this.stack.push(val);
+};
+// 原始栈和min栈同时pop
+MinStack.prototype.pop = function () {
+  this.stack.pop();
+  this.min.pop();
+};
+
+MinStack.prototype.top = function () {
+  return this.stack[this.stack.length - 1];
+};
+MinStack.prototype.getMin = function () {
+  return this.min[this.min.length - 1];
+};
+
+//双端队列
+// leetcode链接：
+const MyCircularDeque = function (k) {
+  this.queue = new Array(k);
+  this.size = 0;
+  this.limit = k;
+  // left和right的初始值设为多少都可以，因为size为0时，left和right没有意义
+  this.left = 0;
+  this.right = 0;
+};
+MyCircularDeque.prototype.insertFront = function (value) {
+  if (this.isFull()) {
+    return false;
+  } else {
+    // 如果队列为空，将left和right重新设置为0，方便理解和操作
+    if (this.isEmpty()) {
+      this.left = this.right = 0;
+      this.queue[0] = value;
+    } else {
+      // 队头加元素，left左移，若left已经为0，则回到k-1位置
+      this.left = this.left === 0 ? this.limit - 1 : this.left - 1;
+      this.queue[this.left] = value;
+    }
+    this.size++;
+    return true;
+  }
+};
+MyCircularDeque.prototype.insertLast = function (value) {
+  if (this.isFull()) {
+    return false;
+  } else {
+    // 如果队列为空，将left和right重新设置为0，方便理解和操作
+    if (this.isEmpty()) {
+      this.left = this.right = 0;
+      this.queue[0] = value;
+    } else {
+      // 队尾加元素，right右移，若right已经为k-1，则回到0位置
+      this.right = this.right === this.limit - 1 ? 0 : this.right + 1;
+      this.queue[this.right] = value;
+    }
+    this.size++;
+    return true;
+  }
+};
+
+MyCircularDeque.prototype.deleteFront = function () {
+  if (this.isEmpty()) {
+    return false;
+  } else {
+    // 队头取元素，left右移，若left已经为k-1，则回到0位置
+    this.left = this.left === this.limit - 1 ? 0 : this.left + 1;
+    this.size--;
+    return true;
+  }
+};
+
+MyCircularDeque.prototype.deleteLast = function () {
+  if (this.isEmpty()) {
+    return false;
+  } else {
+    // 队尾取元素，right左移，若right已经为0，则回到k-1位置
+    this.right = this.right === 0 ? this.limit - 1 : this.right - 1;
+    this.size--;
+    return true;
+  }
+};
+MyCircularDeque.prototype.getFront = function () {
+  // 查看队头元素
+  if (this.isEmpty()) return -1;
+  return this.queue[this.left];
+};
+MyCircularDeque.prototype.getRear = function () {
+  // 查看队尾元素
+  if (this.isEmpty()) return -1;
+  return this.queue[this.right];
+};
+MyCircularDeque.prototype.isEmpty = function () {
+  return this.size === 0;
+};
+MyCircularDeque.prototype.isFull = function () {
+  return this.size === this.limit;
+};
