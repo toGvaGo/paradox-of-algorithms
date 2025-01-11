@@ -123,3 +123,57 @@ function postorderTraversal(root) {
   }
   return ans;
 }
+
+// 非递归 单栈
+function postorderTraversal(root) {
+  const ans = [];
+  if (!root) return ans;
+  const stack = [];
+  let h = root;
+  stack.push(h);
+  while (stack.length) {
+    // 注意，这里模拟的是栈的peek方法，只是观察栈顶元素，可别用pop直接把他弹出了
+    const cur = stack[stack.length - 1];
+
+    if (cur.left !== null && h !== cur.left && h !== cur.right) {
+      // 左孩子不为空，且左右孩子都没被处理过，左孩子先入栈
+      stack.push(cur.left);
+    } else if (cur.right !== null && h !== cur.right) {
+      // 右孩子不为空，且右孩子没被处理过，右孩子入栈
+      stack.push(cur.right);
+    } else {
+      // 左右孩子都为空，或者左右孩子都已经被处理过了，那这个节点就可以被处理了
+      ans.push(cur.val);
+      // 处理过了，弹出，作为下一个节点的判断依据
+      h = stack.pop();
+    }
+  }
+  return ans;
+}
+
+// 层序遍历
+// leetcode链接：https://leetcode.cn/problems/binary-tree-level-order-traversal/description/
+function levelOrder(root) {
+  let queue = [];
+  let ans = [];
+  if (!root) return ans;
+  queue.push(root);
+  while (queue.length) {
+    // 记录当前层的长度
+    const length = queue.length;
+    // 记录当前层有哪些节点
+    const level = [];
+    // 每次内部循环结束，这一层的节点都已出列，且下一层节点都已入列
+    for (let i = 0; i < length; i++) {
+      const node = queue.shift();
+      level.push(node.val);
+      // 左孩子先入列，右孩子再入列
+      node.left && queue.push(node.left);
+      node.right && queue.push(node.right);
+    }
+    // 这一层处理完毕，记录答案
+    ans.push(level);
+  }
+  return ans;
+}
+
