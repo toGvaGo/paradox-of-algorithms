@@ -34,7 +34,6 @@ function mergeTwoLists(head1, head2) {
   if (head2 === null) {
     return head1;
   }
-
   // 谁小谁做头
   let head = head1.val < head2.val ? head1 : head2;
   // cur1、cur2用于遍历旧链表，prev用于记录新链表的尾节点

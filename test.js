@@ -227,66 +227,130 @@ Array.prototype.myReduce = function (callbackFn, initValue) {
 // };
 
 // 手写发布订阅
-class EventEmitter {
-  constructor() {
-    // 事件容器，键是事件名，值是一个数组，存储该事件的所有订阅者
-    this.handlers = {};
-  }
-  // 订阅
-  on(event, handler) {
-    // 先检测当前事件是已有订阅者
-    if (!this.handlers[event]) {
-      this.handlers[event] = [];
-    }
-    this.handlers[event].push(handler);
-  }
-  // 发布
-  emit(event) {
-    // 若当前事件还没被订阅，抛出错误
-    if (!this.handlers[event]) {
-      throw new Error(`Event ${event} is not exist`);
-    }
-    // 遍历整个数组，通知所有订阅者
-    this.handlers[event].forEach(handler => handler(...arguments));
-  }
-  remove(event, handler) {
-    if (!this.handlers[event]) {
-      throw new Error(`Event ${event} is not exist`);
-    }
-    // 若未指定删除哪个订阅者，删除整个事件
-    if (!handler) {
-      delete this.handlers[event];
-    } else {
-      // 若对应事件中没有该订阅者，抛出错误
-      const index = this.handlers[event].indexOf(handler);
-      if (index === -1) {
-        throw new Error('The handler is not exist');
-      }
-      this.handlers[event].splice(index, 1);
-      // 若该事件只有这一个订阅者，删除这个事件
-      if (this.handlers[event].length === 0) {
-        delete this.handlers[event];
-      }
-    }
-  }
-  // 只订阅一次，发布后应删除对应的订阅者
-  once(event, handler) {
-    // 重新封装回调，在发布时执行handler，然后执行remove删除
-    const onceHandler = (...args) => {
-      handler(...args);
-      this.remove(event, onceHandler);
-    };
-    this.on(event, onceHandler);
-  }
-}
+// class EventEmitter {
+//   constructor() {
+//     // 事件容器，键是事件名，值是一个数组，存储该事件的所有订阅者
+//     this.handlers = {};
+//   }
+//   // 订阅
+//   on(event, handler) {
+//     // 先检测当前事件是已有订阅者
+//     if (!this.handlers[event]) {
+//       this.handlers[event] = [];
+//     }
+//     this.handlers[event].push(handler);
+//   }
+//   // 发布
+//   emit(event) {
+//     // 若当前事件还没被订阅，抛出错误
+//     if (!this.handlers[event]) {
+//       throw new Error(`Event ${event} is not exist`);
+//     }
+//     // 遍历整个数组，通知所有订阅者
+//     this.handlers[event].forEach(handler => handler(...arguments));
+//   }
+//   remove(event, handler) {
+//     if (!this.handlers[event]) {
+//       throw new Error(`Event ${event} is not exist`);
+//     }
+//     // 若未指定删除哪个订阅者，删除整个事件
+//     if (!handler) {
+//       delete this.handlers[event];
+//     } else {
+//       // 若对应事件中没有该订阅者，抛出错误
+//       const index = this.handlers[event].indexOf(handler);
+//       if (index === -1) {
+//         throw new Error('The handler is not exist');
+//       }
+//       this.handlers[event].splice(index, 1);
+//       // 若该事件只有这一个订阅者，删除这个事件
+//       if (this.handlers[event].length === 0) {
+//         delete this.handlers[event];
+//       }
+//     }
+//   }
+//   // 只订阅一次，发布后应删除对应的订阅者
+//   once(event, handler) {
+//     // 重新封装回调，在发布时执行handler，然后执行remove删除
+//     const onceHandler = (...args) => {
+//       handler(...args);
+//       this.remove(event, onceHandler);
+//     };
+//     this.on(event, onceHandler);
+//   }
+// }
 
-const event = new EventEmitter();
-const handle = (...payload) => console.log(payload);
+// const event = new EventEmitter();
+// const handle = (...payload) => console.log(payload);
 
-event.on('click', handle);
-event.emit('click', 100, 200, 300, 100);
-event.remove('click', handle);
-event.once('dbclick', function () {
-  console.log('click');
+// event.on('click', handle);
+// event.emit('click', 100, 200, 300, 100);
+// event.remove('click', handle);
+// event.once('dbclick', function () {
+//   console.log('click');
+// });
+// event.emit('dbclick', 100);
+
+// 实现 a == 1 && a == 2 && a == 3 为 true
+// const a = new Proxy(
+//   {},
+//   {
+//     _counter: 1,
+
+//     get(target, prop) {
+//       if (prop === Symbol.toPrimitive) {
+//         return hint => {
+//           return this._counter++; // 每次返回递增的值
+//         };
+//       }
+//       return undefined;
+//     }
+//   }
+// );
+// const a = {
+//   value: 1,
+//   valueOf() {
+//     return this.value++;
+//   }
+// };
+// const a = {
+//   value: 1,
+//   toString(hint) {
+//     return this.value++;
+//   }
+// };
+// const a = {
+//   value: 1,
+//   [Symbol.toPrimitive](hint) {
+//     if (hint === 'default') {
+//       return this.value++;
+//     }
+//   }
+// };
+
+const b = {
+  _value: 1,
+  get value() {
+    return this._value++;
+  }
+};
+var value = 1;
+window.a = {
+  get: function () {
+    return value++;
+  }
+};
+
+var value = 1;
+Object.defineProperty(window, 'a', {
+  get() {
+    return value++;
+  }
 });
-event.emit('dbclick', 100);
+
+console.log(a === 1 && a === 2 && a === 3); // true
+// console.log(b.value === 1 && b.value === 2 && b.value === 3);
+// console.log(a.value === 1 && a.value === 2 && a.value === 3);
+console.log(a === 1 && a === 2 && a === 3); // true
+// console.log(a === 1);
+// console.log(a.value === 1 && a.value === 2 && a.value === 3); // true
