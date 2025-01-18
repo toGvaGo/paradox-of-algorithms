@@ -354,3 +354,122 @@ console.log(a === 1 && a === 2 && a === 3); // true
 console.log(a === 1 && a === 2 && a === 3); // true
 // console.log(a === 1);
 // console.log(a.value === 1 && a.value === 2 && a.value === 3); // true
+
+// 借助其他数据结构的方法：Map、Set
+// map
+let ans = [];
+const map = new Map();
+for (let i = 0; i < arr.length; i++) {
+  if (!map.has(arr[i])) {
+    map.set(arr[i], 1);
+  }
+}
+for (const key in map) {
+  ans.push(key);
+}
+// Set
+ans = [...new Set(arr)];
+
+// 直接去重：inculdes、reduce、filter+indexOf、some
+// 暴力去重
+for (let i = 0; i < arr.length; i++) {
+  if (!ans.includes(arr[i])) {
+    ans.push(arr[i]);
+  }
+}
+// some
+arr.forEach(item => {
+  if (!ans.some(uniqueItem => uniqueItem === item)) {
+    ans.push(item);
+  }
+});
+// reduce
+ans = arr.reduce((prev, cur) => {
+  if (!prev.includes(cur)) {
+    prev.push(cur);
+  }
+  return prev;
+}, []);
+// filter
+ans = arr.filter((item, index) => arr.indexOf(item) === index);
+
+//深拷贝
+function deepClone(obj) {
+  // 记录已经拷贝过的对象，处理循环引用问题
+  // WeakMap弱引用，避免拷贝完成后，作为键的对象可能不会被垃圾回收的问题
+  const map = new WeakMap();
+  // 若不是对象则不用做后续处理
+  function isObject(target) {
+    return (
+      (typeof target === 'object' && target) || typeof target === 'function'
+    );
+  }
+  function clone(data) {
+    if (!isObject(data)) return data;
+    // 三种特殊类型的预处理
+    if ([Date, RegExp].includes(data.constructor)) {
+      return new data.constructor(data);
+    }
+    if (typeof data === 'function') {
+      return new Function('return' + data.toString());
+    }
+    // 解决循环引用
+    const exist = map.get(data);
+    if (exist) {
+      return exist;
+    }
+    // 处理Map和Set结构
+    if (data instanceof Map) {
+      const result = new Map();
+      map.set(data, result);
+      data.forEach((value, key) => {
+        if (isObject(value)) {
+          result.set(key, clone(value));
+        } else {
+          result.set(key, value);
+        }
+      });
+      return result;
+    }
+    if (data instanceof Set) {
+      const result = new Set();
+      map.set(data, result);
+      data.forEach(value => {
+        if (isObject(value)) {
+          result.add(clone(value));
+        } else {
+          result.add(value);
+        }
+      });
+      return result;
+    }
+    // 正式开始处理普通对象
+    // 使用ownKeys可以获取到对象的所有属性键，包括Symbol类型
+    // 使用getOwnPropertyDescriptors获取对象的所有属性描述符，包括writable、enumerable等
+    const keys = Reflect.ownKeys(data);
+    const allDesc = Object.getOwnPropertyDescriptors(data);
+    // 使用data完整的配置，包括data的原型来创建一个新对象，实现拷贝
+    const result = Object.create(Object.getPrototypeOf(data), allDesc);
+    map.set(data, result);
+    keys.forEach(key => {
+      const value = data[key];
+      if (isObject(value)) {
+        result[key] = clone(value);
+      } else {
+        result[key] = value;
+      }
+    });
+    return result;
+  }
+
+  return clone(target);
+}
+
+function myNew(constructor, ...args) {
+  if (typeof constructor !== 'function') {
+    throw new TypeError('constructor is not a function');
+  }
+  const obj = Object.create(constructor.prototype);
+  const result = constructor.apply(obj, args);
+  return result instanceof Object ? result : obj;
+}

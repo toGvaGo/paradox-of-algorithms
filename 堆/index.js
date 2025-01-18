@@ -1,5 +1,5 @@
 function swap(arr, i, j) {
-  // ES6简便写法
+  // ES6简便写法 这种交换速度慢
   // [arr[i], arr[j]] = [arr[j], arr[i]];
   // 标准交换写法
   let temp = arr[i];
@@ -60,7 +60,6 @@ class Heap {
     this.heapInsert(this.size - 1);
   }
 }
-const heap = new Heap((a, b) => b - a);
 //堆排序
 function heapSort(arr) {
   let n = arr.length;
@@ -157,6 +156,35 @@ function mergeKLists(lists) {
 }
 // 重复线段
 // leetcode链接：
-function test() {
-  
+function test() {}
+// 将数组和减半的最少操作次数
+// leetcode链接：https://leetcode.cn/problems/minimum-operations-to-halve-array-sum/description/
+function halveArray(nums) {
+  const heap = new Heap();
+  const n = nums.length;
+  heap.size = n;
+  let sum = 0;
+  let ans = 0;
+  for (let i = 0; i < n; i++) {
+    heap.array.push(nums[i]);
+    // 记录原始的数组和
+    sum += nums[i];
+  }
+  for (let i = n - 1; i >= 0; i--) {
+    heap.heapify(i);
+  }
+
+  // 需要减少的目标值
+  const target = sum / 2;
+  // 当前已减少的和
+  let cur = 0;
+  while (cur < target) {
+    // 直接操作堆顶元素
+    heap.array[0] /= 2;
+    cur += heap.array[0];
+    ans++;
+    // 记录答案后记得重新调整堆
+    heap.heapify(0);
+  }
+  return ans;
 }
